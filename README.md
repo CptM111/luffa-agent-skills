@@ -33,6 +33,7 @@ Luffa is a groundbreaking **Web3 × AI Super Connector** that integrates decentr
 | [`luffa-did`](skills/luffa-did/SKILL.md) | Decentralized identity | Resolve handles, issue/verify credentials |
 | [`luffa-airdrop`](skills/luffa-airdrop/SKILL.md) | Token airdrops | Distribute tokens to communities and subscribers |
 | [`luffa-dex`](skills/luffa-dex/SKILL.md) | DEX trading & bots | Swap tokens, place limit orders, deploy autonomous trading bots via MCP |
+| [`luffa-card-purchase`](skills/luffa-card-purchase/SKILL.md) | Card application & purchase | Apply for card, check eligibility, verify KYC, submit application |
 
 ---
 
