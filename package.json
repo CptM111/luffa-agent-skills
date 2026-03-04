@@ -1,0 +1,35 @@
+{
+  "name": "luffa-agent-skills",
+  "version": "1.0.0",
+  "description": "AI agent skills for the Luffa Web3 x AI SuperConnector platform — wallet, messaging, channels, Super Box, DID, and airdrops.",
+  "keywords": [
+    "luffa",
+    "web3",
+    "ai",
+    "agent",
+    "skills",
+    "did",
+    "wallet",
+    "messaging",
+    "channel",
+    "superbox",
+    "airdrop",
+    "blockchain",
+    "crypto"
+  ],
+  "homepage": "https://www.luffa.im",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luffa/luffa-agent-skills"
+  },
+  "license": "Apache-2.0",
+  "author": "Luffa Team <superbox-cs@luffa.im>",
+  "skills": [
+    "skills/luffa-wallet",
+    "skills/luffa-messenger",
+    "skills/luffa-channel",
+    "skills/luffa-superbox",
+    "skills/luffa-did",
+    "skills/luffa-airdrop"
+  ]
+}
