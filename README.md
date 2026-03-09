@@ -1,197 +1,141 @@
 # Luffa Agent Skills
 
-<div align="center">
+**Build AI-powered bots and agents for the Luffa ecosystem.**
 
-**Turn conversations into on-chain actions.**
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![GitHub repo stars](https://img.shields.io/github/stars/CptM111/luffa-agent-skills?style=social)](https://github.com/CptM111/luffa-agent-skills)
 
-AI agent skills for the [Luffa](https://www.luffa.im) Web3 × AI SuperConnector — wallet, messaging, channels, Super Box, identity, and airdrops, all accessible through natural language.
+This repository provides a production-ready, runnable **MCP Server** that exposes Luffa's Service Account APIs as tools for AI agents. It enables developers to build AI-driven workflows for customer service, community management, airdrop distribution, and more, right inside Luffa.
 
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Twitter](https://img.shields.io/badge/Twitter-@LuffaMessage-1DA1F2?logo=twitter)](https://x.com/LuffaMessage)
-[![Telegram](https://img.shields.io/badge/Telegram-LuffaMessage-2CA5E0?logo=telegram)](https://t.me/LuffaMessage)
+Unlike the previous mock-based version, this is a **real, working implementation**. Just add your Luffa App ID and Secret, and you can start building.
 
-</div>
+## Core Problem Solved
 
----
+AI agents are powerful, but they need tools (`skills`) to interact with the outside world. This project gives agents the tools to interact with the Luffa platform, turning abstract instructions into concrete actions like sending messages, managing users, and verifying wallet information.
 
-## What is Luffa?
+It bridges the gap between Large Language Models and the Luffa API, enabling true **Agentic Economy** infrastructure.
 
-Luffa is a groundbreaking **Web3 × AI Super Connector** that integrates decentralized identity (DID), AI agents, Web3-native wallets, encrypted social features, and mini-programs into a unified ecosystem. It empowers users, communities, brands, and AI developers to build programmable economic models, deploy loyalty programs, and collaborate in a verifiable, secure environment.
+## Key Features
 
-**Luffa Agent Skills** bring this ecosystem to your AI coding assistant. Using the battle-tested `SKILL.md` format, any AI agent — Claude, Cursor, Codex, or your own — can now interact with Luffa's full feature set through natural language.
+- **Production-Ready MCP Server**: A runnable Node.js server built with the official `@modelcontextprotocol/sdk`.
+- **Real API Integration**: Implements the actual Luffa Service Account API, including authentication, message sending, user management, and more.
+- **Dry-Run Mode**: Test and develop without real credentials. The server returns realistic mock data for all endpoints.
+- **Self-Verifying**: Includes a built-in integration test suite (`npm test`) that verifies all tools in dry-run mode.
+- **AI Agent Compatible**: Designed for use with any MCP-compatible agent, including Claude, Cursor, and custom agent frameworks.
+- **Comprehensive Skills**: Provides a `luffa-service-account` skill that covers the full lifecycle of managing a Luffa presence.
 
----
+## Getting Started
 
-## Available Skills
+### 1. Prerequisites
 
-| Skill | Description | Key Actions |
-|---|---|---|
-| [`luffa-wallet`](skills/luffa-wallet/SKILL.md) | Multi-chain Web3 wallet | Check balance, view holdings, send tokens |
-| [`luffa-messenger`](skills/luffa-messenger/SKILL.md) | E2EE encrypted messaging | Send messages, read inbox, create groups |
-| [`luffa-channel`](skills/luffa-channel/SKILL.md) | On-chain creator channels | Publish content, manage subscribers, monetize |
-| [`luffa-superbox`](skills/luffa-superbox/SKILL.md) | Mini-program platform | Discover apps, register and submit mini-programs |
-| [`luffa-did`](skills/luffa-did/SKILL.md) | Decentralized identity | Resolve handles, issue/verify credentials |
-| [`luffa-airdrop`](skills/luffa-airdrop/SKILL.md) | Token airdrops | Distribute tokens to communities and subscribers |
-| [`luffa-dex`](skills/luffa-dex/SKILL.md) | DEX trading & bots | Swap tokens, place limit orders, deploy autonomous trading bots via MCP |
+- Node.js v18+
+- A Luffa Service Account. [Register here](https://super.luffa.im) to get your **App ID** and **App Secret**.
 
----
+### 2. Installation & Setup
 
-## Quick Start
+```bash
+# Clone the repository
+git clone https://github.com/CptM111/luffa-agent-skills.git
+cd luffa-agent-skills/mcp-server
 
-### Option 1: One-Line Install (Recommended)
+# Install dependencies
+npm install
 
-```shell
-npx skills add luffa/luffa-agent-skills
+# Build the server
+npm run build
 ```
 
-This auto-detects your environment (Claude Code, Cursor, Codex CLI, or OpenCode) and installs accordingly.
+### 3. Running the Server
 
-### Option 2: Claude Code
+You can run the server in two modes:
 
-```
-/plugin marketplace add luffa/luffa-agent-skills
-/plugin install luffa-agent-skills
-```
+**A) Live Mode (with real credentials)**
 
-### Option 3: Codex CLI
+```bash
+# Set your credentials as environment variables
+export LUFFA_APP_ID="your_app_id_here"
+export LUFFA_APP_SECRET="your_app_secret_here"
 
-Tell Codex:
-
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/luffa/luffa-agent-skills/main/.codex/INSTALL.md
+# Start the server
+node dist/index.js
 ```
 
-### Option 4: OpenCode
+**B) Dry-Run Mode (for testing, no credentials needed)**
 
-Tell OpenCode:
-
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/luffa/luffa-agent-skills/main/.opencode/INSTALL.md
-```
-
----
-
-## Prerequisites
-
-All skills require Luffa API credentials. Register at the [Luffa Super Box Developer Portal](https://super.luffa.im/luffasuperapp/login-operate/809d6e666cd85e877aa0a75a28e58ebf).
-
-Create a `.env` file in your project root:
-
-```shell
-LUFFA_API_KEY="your-api-key"
-LUFFA_SECRET_KEY="your-secret-key"
+```bash
+# The server automatically uses dry-run mode if credentials are not found
+node dist/index.js
 ```
 
-> **Security warning**: Never commit your `.env` file to git. Add it to `.gitignore` and never expose credentials in logs, screenshots, or chat messages.
+### 4. Self-Verification
 
----
+Run the integration tests to ensure everything is working correctly.
 
-## Skill Workflows
-
-Luffa Agent Skills are designed to compose together into powerful multi-step workflows:
-
-### Community Reward Airdrop
-
-> "Airdrop 10 EDS to all my channel subscribers"
-
-```
-luffa-channel  → check subscriber count
-luffa-wallet   → verify available balance
-luffa-airdrop  → estimate cost, create campaign
-luffa-airdrop  → execute (after user confirms)
-luffa-channel  → post announcement
+```bash
+# This will run all 19 tests against the mock server
+npm test
 ```
 
-### Send Tokens by Handle
-
-> "Send 50 EDS to @alice"
+You should see all tests passing:
 
 ```
-luffa-did      → resolve @alice to wallet address
-luffa-wallet   → verify sender balance
-luffa-wallet   → execute transfer (after user confirms)
-luffa-messenger → notify @alice via message
+✅ All tests passed! The Luffa MCP server is ready.
 ```
 
-### Launch a Creator Channel
+### 5. Connecting to an AI Agent (Example: Claude Desktop)
 
-> "Create a channel called Alpha Signals with a $9.99/month premium tier"
+1.  Open your Claude Desktop configuration file (`~/.claude/claude_desktop_config.json`).
+2.  Add the `luffa` server to your `mcpServers` list:
 
-```
-luffa-channel  → create on-chain channel
-luffa-channel  → set up paid subscription tier
-luffa-channel  → publish first post
-luffa-superbox → link a DeFi mini-program
-```
+    ```json
+    {
+      "mcpServers": {
+        "luffa": {
+          "command": "node",
+          "args": ["/path/to/your/luffa-agent-skills/mcp-server/dist/index.js"],
+          "env": {
+            "LUFFA_APP_ID": "your_app_id",
+            "LUFFA_APP_SECRET": "your_app_secret"
+          }
+        }
+      }
+    }
+    ```
 
-### Autonomous DCA Trading Bot
+3.  Restart Claude. You can now use prompts like:
 
-> "Deploy a DCA bot to buy 100 USDT of EDS every day"
+    > "@luffa Send a welcome message to my new follower with openid `user_openid_123`"
 
-```
-luffa-wallet   → verify USDT balance
-luffa-dex      → get current EDS/USDT quote
-luffa-dex      → deploy DCA bot (after user confirms)
-luffa-messenger → send deployment confirmation
-[Scheduled]    → daily P&L update via luffa-messenger
-```
+    > "@luffa How many followers do I have? List their openids."
 
-### Token-Gated Membership
+    > "@luffa Create a new menu with a button that links to our website."
 
-> "Issue membership credentials to all my premium subscribers"
+## Available Skills & Tools
 
-```
-luffa-channel  → get premium subscriber list
-luffa-did      → issue ChannelMembership credential to each
-luffa-messenger → notify subscribers of their credential
-```
+This repository now focuses on a single, powerful, and realistic skill:
 
----
+### `luffa-service-account`
 
-## Example Code
+Provides 14 tools for managing your Luffa Service Account. See the [SKILL.md](./skills/luffa-service-account/SKILL.md) for a full list of tools and example workflows.
 
-See the [`examples/`](examples/) directory for complete workflow implementations:
-
-- [`community-reward-workflow.ts`](examples/community-reward-workflow.ts) — Full airdrop campaign
-- [`send-by-handle.ts`](examples/send-by-handle.ts) — DID-resolved token transfer
-- [`autonomous-dca-bot.ts`](examples/autonomous-dca-bot.ts) — Autonomous DCA trading bot with MCP agent-to-agent invocation
-
----
-
-## API Key Security Notice & Disclaimer
-
-This repository does not include shared or demo API keys. You must obtain your own credentials from the [Luffa Developer Portal](https://super.luffa.im/luffasuperapp/login-operate/809d6e666cd85e877aa0a75a28e58ebf).
-
-By using these skills, you acknowledge that:
-
-- You are solely responsible for the security and management of your API credentials.
-- Irreversible on-chain actions (transfers, airdrops) must be confirmed by the user before execution.
-- Luffa is not liable for any losses resulting from improper credential management or unauthorized agent actions.
-
----
-
-## Developer Resources
-
-| Resource | Link |
+| Category | Tools |
 |---|---|
-| Luffa Website | [luffa.im](https://www.luffa.im) |
-| Developer Portal | [super.luffa.im](https://super.luffa.im/luffasuperapp/login-operate/809d6e666cd85e877aa0a75a28e58ebf) |
-| Documentation | [luffa.im/SuperBox/docs](https://luffa.im/SuperBox/docs/en/quickStartGuide/quickStartGuide.html) |
-| User Guide | [userguide.luffa.im](https://userguide.luffa.im) |
-| Twitter | [@LuffaMessage](https://x.com/LuffaMessage) |
-| Telegram | [t.me/LuffaMessage](https://t.me/LuffaMessage) |
-| Support Email | [superbox-cs@luffa.im](mailto:superbox-cs@luffa.im) |
-| Customer Support | [callup.luffa.im](https://callup.luffa.im/p/9uXei6q5KXy) |
+| **Authentication** | `service_account_get_token` |
+| **Messaging** | `message_send_text`, `message_send_image`, `message_send_news`, `message_broadcast_text`, `message_send_template`, `message_get_templates` |
+| **User Management** | `user_get_followers`, `user_get_info` |
+| **Segmentation** | `tag_get_all`, `tag_create`, `tag_batch_assign` |
+| **Menu** | `menu_get`, `menu_create` |
+| **Mini Program** | `miniprogram_verify_login` |
+| **Media** | `media_upload` |
 
----
+## From Mock to Real: The Architectural Shift
 
-## License
+The previous version of this repository used multiple, disparate `SKILL.md` files with mocked API endpoints. This was useful for design but not for real-world use.
 
-Apache-2.0 — see [LICENSE](LICENSE) for details.
+This version makes a critical architectural shift:
 
----
+1.  **Centralized Logic**: All API interaction logic is centralized in the `mcp-server`. The `SKILL.md` files now act as pure documentation, describing the tools that the server exposes.
+2.  **Real Implementation**: The server uses `axios` to make real HTTP requests to the Luffa API, handling authentication and request signing.
+3.  **Runnable & Testable**: The project is now a standard Node.js application that can be installed, built, and tested, providing a robust foundation for developers.
 
-<div align="center">
-Built with ❤️ for the Luffa ecosystem. <br/>
-<strong>Attention → Ownership. Connections → Commerce.</strong>
-</div>
+This approach ensures that what you build and test locally is exactly what will run in production when called by an AI agent.

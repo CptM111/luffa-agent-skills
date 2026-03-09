@@ -1,0 +1,41 @@
+{
+  "name": "@luffa/mcp-server",
+  "version": "1.0.0",
+  "description": "Luffa MCP Server — exposes Luffa Service Account & Mini Program APIs as Model Context Protocol tools for AI agents",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "luffa-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "node_modules/.bin/esbuild src/index.ts --bundle --platform=node --target=node18 --outfile=dist/index.js --external:axios && node_modules/.bin/esbuild src/test/integration.test.ts --bundle --platform=node --target=node18 --outfile=dist/test/integration.test.js --external:axios",
+    "start": "node dist/index.js",
+    "dev": "LUFFA_DRY_RUN=true node dist/index.js",
+    "test": "npm run build && LUFFA_DRY_RUN=true LUFFA_APP_ID=test LUFFA_APP_SECRET=test node dist/test/integration.test.js",
+    "test:dry": "LUFFA_DRY_RUN=true node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "axios": "^1.7.9",
+    "zod": "^3.23.8",
+    "zod-to-json-schema": "^3.25.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "esbuild": "^0.27.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "luffa",
+    "mcp",
+    "model-context-protocol",
+    "web3",
+    "ai-agent",
+    "service-account"
+  ],
+  "license": "Apache-2.0"
+}

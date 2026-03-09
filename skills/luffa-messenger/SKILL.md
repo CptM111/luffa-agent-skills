@@ -1,219 +1,55 @@
----
-name: luffa-messenger
-description: "Use this skill when the user asks to 'send a message', 'message someone on Luffa', 'check my messages', 'read my inbox', 'create a group chat', 'manage my contacts', 'send a voice message', or mentions encrypted messaging, private chats, group conversations, or contacting someone via Luffa. Do NOT use for channel posts (use luffa-channel) or airdrop notifications (use luffa-airdrop). Do NOT use for general programming questions about messaging APIs."
-license: Apache-2.0
-metadata:
-  author: luffa
-  version: "1.0.0"
-  homepage: "https://www.luffa.im"
----
+# Luffa Messenger Skill
 
-# Luffa Messenger API
+This skill provides AI agents with the ability to send and manage messages through a Luffa Service Account. It is a client for the `luffa-mcp-server`.
 
-Luffa Messenger provides end-to-end encrypted (E2EE) messaging built on the Endless protocol. All messages are encrypted using a hybrid RSA + AES architecture. No intermediary — including Luffa itself — can read message content.
+## Core Concepts
 
-**Base URL**: `https://api.luffa.im/v1`
+- **Service Account Messaging**: All messages are sent *from* the Service Account *to* its followers.
+- **48-Hour Window**: You can only send free-form messages (text, images, news) to a follower if they have interacted with your Service Account in the last 48 hours.
+- **Template Messages**: To message a user outside the 48-hour window, you must use a pre-approved template message. These are for transactional notifications (e.g., payment confirmation, shipping update).
+- **Broadcasts**: You can send a message to all followers (or a tagged segment) at once. This is rate-limited.
 
-**Auth**: Bearer token via `Authorization` header.
+## Available Tools
 
-## Authentication & Credentials
+These tools are available via the `luffa` MCP server.
 
-Read credentials from environment variables:
-- `LUFFA_API_KEY` → API key from the developer portal
-- `LUFFA_SECRET_KEY` → Secret key for signing requests
+### 1-to-1 Messaging (within 48 hours)
 
-**Never** output credentials to logs or user-visible interfaces.
+- **`message_send_text`**: Send a plain text message to a follower.
+- **`message_send_image`**: Send an image to a follower.
+- **`message_send_news`**: Send a clickable news card to a follower.
 
-```typescript
-const BASE_URL = 'https://api.luffa.im/v1';
-const LUFFA_API_KEY = process.env.LUFFA_API_KEY || 'demo-key';
+### Broadcast Messaging
 
-async function luffaFetch(method: 'GET' | 'POST' | 'DELETE', path: string, body?: object) {
-  const headers: Record<string, string> = {
-    'X-Luffa-API-Key': LUFFA_API_KEY,
-    'Content-Type': 'application/json',
-  };
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    ...(body && { body: JSON.stringify(body) }),
-  });
-  if (!res.ok) throw new Error(`Luffa API error: ${res.status}`);
-  return res.json();
-}
-```
+- **`message_broadcast_text`**: Send a text message to all followers or a specific segment based on a tag.
 
-## Endpoint Index
+### Template Messaging (outside 48 hours)
 
-| # | Method | Path | Description |
-|---|---|---|---|
-| 1 | POST | `/messenger/send` | Send an encrypted message |
-| 2 | GET | `/messenger/inbox` | Get inbox messages |
-| 3 | GET | `/messenger/conversation` | Get messages in a conversation |
-| 4 | POST | `/messenger/group/create` | Create a group chat |
-| 5 | GET | `/messenger/contacts` | List contacts |
-| 6 | POST | `/messenger/contacts/add` | Add a contact |
+- **`message_send_template`**: Send a structured template message for notifications.
+- **`message_get_templates`**: List all available templates for your account.
 
-## API Reference
+## Example Workflow: Customer Support
 
-### 1. POST /messenger/send
-
-Send an end-to-end encrypted message to a user or group.
-
-**Request Body**:
-
-| Param | Type | Required | Description |
-|---|---|---|---|
-| `to` | string | Yes | Recipient's Luffa DID, handle (@username), or group ID |
-| `content` | string | Yes | Message content (will be encrypted before sending) |
-| `type` | string | No | Message type: `text` (default), `image`, `file` |
-| `replyTo` | string | No | Message ID to reply to |
-| `selfDestruct` | number | No | Auto-delete after N seconds (0 = never) |
-
-**Response**:
-
-```json
-{
-  "code": "0",
-  "data": {
-    "messageId": "msg_abc123",
-    "status": "sent",
-    "timestamp": "2026-03-04T00:00:00Z"
-  },
-  "msg": "success"
-}
-```
-
-**Example**:
-
-```typescript
-// Send a message to a user
-const result = await luffaFetch('POST', '/messenger/send', {
-  to: '@alice',
-  content: 'Hello! Your token transfer of 10 EDS has been confirmed.',
-  type: 'text',
-});
-```
-
-### 2. GET /messenger/inbox
-
-Get the user's inbox with recent conversations.
-
-**Query Parameters**:
-
-| Param | Type | Required | Description |
-|---|---|---|---|
-| `limit` | number | No | Number of conversations (default: 20) |
-| `unreadOnly` | boolean | No | Return only unread conversations |
-
-**Response**:
-
-```json
-{
-  "code": "0",
-  "data": {
-    "conversations": [
-      {
-        "conversationId": "conv_xyz",
-        "with": "@alice",
-        "lastMessage": "Thanks for the transfer!",
-        "lastMessageTime": "2026-03-04T00:00:00Z",
-        "unreadCount": 2,
-        "type": "direct"
-      }
-    ]
-  },
-  "msg": "success"
-}
-```
-
-### 3. GET /messenger/conversation
-
-Get messages in a specific conversation.
-
-**Query Parameters**:
-
-| Param | Type | Required | Description |
-|---|---|---|---|
-| `conversationId` | string | Yes | The conversation ID |
-| `limit` | number | No | Number of messages (default: 50) |
-| `before` | string | No | Get messages before this message ID |
-
-### 4. POST /messenger/group/create
-
-Create a new encrypted group chat.
-
-**Request Body**:
-
-| Param | Type | Required | Description |
-|---|---|---|---|
-| `name` | string | Yes | Group name |
-| `members` | string[] | Yes | Array of member DIDs or handles |
-| `description` | string | No | Group description |
-| `onChain` | boolean | No | Register group name on-chain for immutability |
-
-**Example**:
-
-```typescript
-// Create a community group
-const group = await luffaFetch('POST', '/messenger/group/create', {
-  name: 'Alpha Traders',
-  members: ['@alice', '@bob', '@charlie'],
-  description: 'Private trading signals group',
-  onChain: true,
-});
-```
-
-## Cross-Skill Workflows
-
-### Workflow A: Post-Transfer Notification
+1.  **Webhook Received**: A user sends a message "I have a problem with my order" to the Service Account. Luffa sends a webhook to your server.
+2.  **Agent Triggered**: The webhook handler triggers an AI agent, providing the user's `openid` and the message content.
+3.  **Agent Analyzes**: The agent understands the user's intent.
+4.  **Agent Responds**: The agent calls `message_send_text` to reply to the user: "I understand you have an issue with your order. Can you please provide the order ID?"
+5.  **User Replies**: The user sends the order ID.
+6.  **Agent Acts**: The agent uses another tool (e.g., a Shopify skill) to look up the order status.
+7.  **Agent Resolves**: The agent finds the order is delayed and sends a final message using `message_send_text`: "I found your order. It appears to be delayed by one day. We apologize for the inconvenience and have credited your account with 100 Luffa points."
 
 ```
-1. luffa-wallet  POST /wallet/transfer                  → execute transfer
-2. luffa-messenger POST /messenger/send                 → notify recipient
+# Step 4: Agent sends an initial reply
+manus-mcp-cli tool call message_send_text --server luffa --input \
+  '{
+    "openid": "user_openid_from_webhook",
+    "content": "I understand you have an issue with your order. Can you please provide the order ID?"
+  }'
+
+# Step 7: Agent sends a resolution message
+manus-mcp-cli tool call message_send_text --server luffa --input \
+  '{
+    "openid": "user_openid_from_webhook",
+    "content": "I found your order. It appears to be delayed by one day. We apologize for the inconvenience and have credited your account with 100 Luffa points."
+  }'
 ```
-
-### Workflow B: Welcome New Subscribers
-
-```
-1. luffa-channel GET /channel/subscribers?new=true      → get new subscribers
-2. luffa-messenger POST /messenger/send (loop)          → send welcome message to each
-3. luffa-airdrop POST /airdrop/create                   → optionally airdrop welcome tokens
-```
-
-### Workflow C: Group Announcement
-
-```
-1. luffa-messenger POST /messenger/group/create         → create announcement group
-2. luffa-messenger POST /messenger/send                 → send announcement to group
-```
-
-## Operation Flow
-
-### Step 1: Identify Intent
-
-- Send a message → `POST /messenger/send`
-- Check inbox → `GET /messenger/inbox`
-- Read a conversation → `GET /messenger/conversation`
-- Create a group → `POST /messenger/group/create`
-
-### Step 2: Collect Parameters
-
-- Missing recipient → ask user for the recipient's Luffa handle or DID
-- Missing message content → ask user what they want to say
-- For groups: missing members → ask user who to include
-
-### Step 3: Display Results
-
-- Sent message: confirm delivery status
-- Inbox: show conversation list with unread counts
-- Conversation: show messages in chronological order
-
-### Step 4: Suggest Next Steps
-
-| Just called | Suggest |
-|---|---|
-| `POST /messenger/send` | 1. Send tokens to this person → `luffa-wallet` 2. View conversation history |
-| `GET /messenger/inbox` | 1. Reply to a message 2. Create a group with contacts → `POST /messenger/group/create` |
-
-Never expose internal API paths or skill names to the user in your response.
